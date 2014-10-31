@@ -9,21 +9,27 @@ def main():
     parser.add_argument('-c', '--column', help='Column to sort by')
     parser.add_argument('-f', '--file', help='Input file to sort')
     parser.add_argument('-o', '--output', help='Output file')
+    parser.add_argument('-d', '--delimiter', help="Specify the file's delimiter.  Comma by default")
 
     args = vars(parser.parse_args())
 
-    if args['file'] is None:
-        input_file = 'input.csv'
-    else:
+    if args['file']:
         input_file = args['file']
-
-    if args['output'] is None:
-        output_file = 'output.csv'
     else:
+        input_file = 'input.csv'               
+
+    if args['output']:
         output_file = args['output']
+    else:
+        output_file = 'output.csv'        
+
+    if args['delimiter']:
+        delimiter = args['delimiter']
+    else:
+        delimiter = ','
 
     with open(input_file, newline='') as csvfile:
-        reader = csv.reader(csvfile, delimiter='\t')
+        reader = csv.reader(csvfile, delimiter=delimiter)
         headers = next(reader)
         data = [line for line in reader]
 
@@ -36,7 +42,7 @@ def main():
 
     sorted_data = sort_csv(headers, data, column)
 
-    write_output(headers, sorted_data, output_file)
+    write_output(headers, sorted_data, output_file, delimiter)
 
 
 def get_column(headers):
@@ -83,15 +89,17 @@ def sort_csv(headers, data, column):
     return sorted_data
 
 
-def write_output(headers, sorted_data, output_file):
+def write_output(headers, sorted_data, output_file, delimiter):
     """
     Write the sorted data to the output file
     """
 
     with open(output_file, 'w', newline='') as csvfile:
-        csvfile = csv.writer(csvfile, delimiter='\t')
+        csvfile = csv.writer(csvfile, delimiter=delimiter)
         csvfile.writerow(headers)
         csvfile.writerows(sorted_data)
+
+    return
 
 
 if __name__ == '__main__':
